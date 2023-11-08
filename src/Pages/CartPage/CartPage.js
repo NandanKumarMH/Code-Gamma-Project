@@ -11,6 +11,11 @@ const CartPage = () => {
     (state) => state.persistedData.AddAndViewCartData.AddAndViewCartData
   );
 
+  const subtotal = ReduxData.reduce(
+    (acc, item) => acc + parseFloat(item.Price) * item.quantity,
+    0
+  );
+
   const navigate = useNavigate("");
 
   const NavigateHandler = () => {
@@ -77,6 +82,29 @@ const CartPage = () => {
               </Button>
             </div>
           </div>
+        )}
+        {ReduxData?.length > 0 ? (
+          <div className="order_Summary">
+            <h3>Order Summary</h3>
+            <div className="order_Details">
+              <p>
+                Subtotal<span>${subtotal?.toFixed(2)}</span>
+              </p>
+              <p>
+                Shipping Estimate<span>$5</span>
+              </p>
+              <p>
+                Tax Estimate<span>$5</span>
+              </p>
+              <hr />
+              <p>
+                Order Total
+                <span>${(subtotal + 10)?.toFixed(2)}</span>
+              </p>
+            </div>
+          </div>
+        ) : (
+          <></>
         )}
       </div>
       <Footer />

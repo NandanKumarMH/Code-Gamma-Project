@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import productImage from "../../Assets/Images/product one.png";
 import star from "../../Assets/Images/star.png";
 import count from "../../Assets/Images/count.png";
@@ -11,6 +11,7 @@ import { getViewSingleProductId } from "../../Redux/ReduxDataSlices/ViewSinglePr
 import {
   DeleteAddAndViewCartData,
   getAddAndViewCartData,
+  reduceItemQuantity,
 } from "../../Redux/ReduxDataSlices/AddAndViewCartDataSlice";
 
 const ProductCard = ({
@@ -25,13 +26,20 @@ const ProductCard = ({
   ratingRate,
   ratingCount,
 }) => {
+  // const [quantity, setQuantity] = useState(0);
+
   const ReduxData = useSelector(
     (state) => state.persistedData.AddAndViewCartData.AddAndViewCartData
   );
 
   const isProductInCart = ReduxData.some((product) => product.uid === Uid);
 
-  console.log(ReduxData);
+  const cartItems = useSelector(
+    (state) => state.persistedData.AddAndViewCartData.AddAndViewCartData
+  );
+
+  const cartItem = cartItems.find((item) => item.uid === Uid);
+  const quantity = cartItem ? cartItem.quantity : 0;
 
   const navigate = useNavigate();
 
@@ -43,6 +51,17 @@ const ProductCard = ({
   };
   const windowPath = window.location.href;
   const cart = windowPath.split("/")[3];
+
+  // Quantity change function
+  const quantityChange = (action, data) => {
+    if (action === "decrease" && quantity > 0) {
+      let Uid = data;
+      dispatch(reduceItemQuantity(Uid));
+    } else if (action === "increase") {
+      let val = data;
+      dispatch(getAddAndViewCartData(val));
+    }
+  };
 
   const AddCartHandler = (data) => {
     let val = data;
@@ -111,6 +130,35 @@ const ProductCard = ({
                 <img src={count} alt="count" className="count_Image" />
               </p>
             </div>
+            {cart === "cart" ? (
+              <div className="quantity_Button">
+                <button onClick={() => quantityChange("decrease", Uid)}>
+                  -
+                </button>
+                <p>{quantity}</p>
+                <button
+                  onClick={() =>
+                    quantityChange("increase", {
+                      uid: Uid,
+                      TitleName: titleName,
+                      Price: price,
+                      OriginalPrice: originalPrice,
+                      Discount: discount,
+                      Category: category,
+                      Description: description,
+                      Image: image,
+                      RatingRate: ratingRate,
+                      RatingCount: ratingCount,
+                      quantity: 1,
+                    })
+                  }
+                >
+                  +
+                </button>
+              </div>
+            ) : (
+              <></>
+            )}
             <div className="card_Buttons">
               {/* <button>Buy Now</button> */}
               {isProductInCart ? (
@@ -139,6 +187,7 @@ const ProductCard = ({
                       Image: image,
                       RatingRate: ratingRate,
                       RatingCount: ratingCount,
+                      quantity: 1,
                     })
                   }
                 >
@@ -228,6 +277,7 @@ const ProductCard = ({
                   Image: image,
                   RatingRate: ratingRate,
                   RatingCount: ratingCount,
+                  quantity: 1,
                 })
               }
             >

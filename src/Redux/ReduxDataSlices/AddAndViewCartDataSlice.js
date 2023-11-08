@@ -6,18 +6,16 @@ export const AddAndViewCartDataSlice = createSlice({
   },
   reducers: {
     getAddAndViewCartData: (state, action) => {
-      console.log("Adding product to cart:", action.payload);
+      const newItem = action.payload;
       const existingProduct = state.AddAndViewCartData.find(
-        (product) => product.uid === action?.payload?.uid
+        (product) => product.uid === newItem.uid
       );
 
-      console.log(!existingProduct);
-
       if (!existingProduct) {
-        state.AddAndViewCartData.push(action.payload);
-        console.log("Product added to cart:", action.payload);
+        newItem.quantity = 1; // Initialize quantity to 1 for new items
+        state.AddAndViewCartData.push(newItem);
       } else {
-        console.log("Product already in cart:", action.payload);
+        existingProduct.quantity += 1; // Increment quantity for existing items
       }
     },
     DeleteAddAndViewCartData: (state, action) => {
@@ -27,10 +25,28 @@ export const AddAndViewCartDataSlice = createSlice({
         (product) => product.uid !== productIdToDelete
       );
     },
+    reduceItemQuantity: (state, action) => {
+      const productIdToReduce = action.payload;
+      const itemToReduce = state.AddAndViewCartData.find(
+        (product) => product.uid === productIdToReduce
+      );
+
+      if (itemToReduce && itemToReduce.quantity > 1) {
+        itemToReduce.quantity -= 1;
+      } else {
+        // Remove the item from the cart if the quantity is 1 or less
+        state.AddAndViewCartData = state.AddAndViewCartData.filter(
+          (product) => product.uid !== productIdToReduce
+        );
+      }
+    },
   },
 });
 
-export const { getAddAndViewCartData, DeleteAddAndViewCartData } =
-  AddAndViewCartDataSlice.actions;
+export const {
+  getAddAndViewCartData,
+  DeleteAddAndViewCartData,
+  reduceItemQuantity,
+} = AddAndViewCartDataSlice.actions;
 
 export default AddAndViewCartDataSlice.reducer;
