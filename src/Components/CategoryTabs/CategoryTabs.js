@@ -176,7 +176,7 @@ export const CategoryTabs = ({ SetLoading }) => {
           )}
         </div>
         <div className="view_All_Btn">
-          {viewAllFlag === true ? (
+          {viewAllFlag === true && productList?.length > 4 ? (
             <button onClick={ViewLessHandler}>View Less</button>
           ) : productList?.length > 4 ? (
             <button onClick={ViewAllHandler}>View All</button>
